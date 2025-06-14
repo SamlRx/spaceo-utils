@@ -1,36 +1,43 @@
-// --- Paramètres ---
+// --- Parameters ---
 
-// Tige cylindrique
-trou_diametre = 3.8;
-trou_profondeur = 10;
-jeu = 0.1;
-diametre_tige = trou_diametre - jeu;
-longueur_tige = trou_profondeur;
+// Cylindrical rod
+hole_diameter = 3.8;
+hole_depth = 10;
+clearance = 0.1;
+rod_diameter = hole_diameter - clearance;
+rod_length = hole_depth;
 
-// Biseau
-hauteur_biseau = 2;
-diametre_biseau_base = diametre_tige - 0.6;  // Légèrement plus large pour bien guider
+// Chamfer
+chamfer_height = 2;
+chamfer_base_diameter = rod_diameter - 0.6;  // Slightly wider to guide well
 
-// Butée rectangulaire
-largeur_butee = 14;
-longueur_butee = 30;
-hauteur_butee = 1.6;
+// Rectangular stop
+stop_width = 14;
+stop_length = 30;
+stop_height = 1.6;
 
-// --- Modèle ---
-module pied() {
+module foot() {
     union() {
-        // Biseau en bas
-        cylinder(h = hauteur_biseau, d1 = diametre_biseau_base, d2 = diametre_tige, $fn = 100);
+        chamfer();
 
-        // Tige au-dessus du biseau
-        translate([0, 0, hauteur_biseau])
-            cylinder(h = longueur_tige - hauteur_biseau, d = diametre_tige, $fn = 100);
+        translate([0, 0, chamfer_height])
+            rod();
 
-        // Butée rectangulaire en haut
-        translate([-largeur_butee/2, -longueur_butee/2, longueur_tige])
-            cube([largeur_butee, longueur_butee, hauteur_butee]);
+        translate([-stop_width/2, -stop_length/2, rod_length])
+            rectangular_stop();
     }
 }
 
-// Appel du module
-pied();
+module chamfer() {
+    cylinder(h = chamfer_height, d1 = chamfer_base_diameter, d2 = rod_diameter, $fn = 100);
+}
+
+module rod() {
+    cylinder(h = rod_length - chamfer_height, d = rod_diameter, $fn = 100);
+}
+
+module rectangular_stop() {
+    cube([stop_width, stop_length, stop_height]);
+}
+
+foot();
